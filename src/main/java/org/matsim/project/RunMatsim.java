@@ -16,45 +16,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.run;
+package org.matsim.project;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel
  *
  */
-public class HelloWorldTest {
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+public class RunMatsim{
 
-	@Test
-	public final void test() {
-		try {
-			Config config = ConfigUtils.loadConfig( "scenarios/equil/config.xml" ) ;
-			config.controler().setWriteEventsInterval(1);
-			config.controler().setLastIteration(1);
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			RunMatsim.run( config );
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).fatal("there was an exception: \n" + ee ) ;
-
-			// if one catches an exception, then one needs to explicitly fail the test:
-			Assert.fail();
+	public static void main(String[] args) {
+		if ( args.length==0 ) {
+			args = new String [] { "scenarios/equil/config.xml" } ;
+			// to make sure that something is run by default; better start from MATSimGUI.
+		} else {
+			Gbl.assertIf( args[0] != null && !args[0].equals( "" ) );
 		}
 
+		Config config = ConfigUtils.loadConfig( args ) ;
+		
+		// possibly modify config here
+		
+		// ---
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		
+		// possibly modify scenario here
+		
+		// ---
+		
+		Controler controler = new Controler( scenario ) ;
+		
+		// possibly modify controler here
 
+//		controler.addOverridingModule( new OTFVisLiveModule() ) ;
+		
+		// ---
+		
+		controler.run();
 	}
-
+	
 }

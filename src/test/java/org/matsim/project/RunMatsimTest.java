@@ -16,47 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.run;
+package org.matsim.project;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel
  *
  */
-public class RunMatsim {
+public class RunMatsimTest{
+	
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	public static void main(String[] args) {
-		Gbl.assertIf(args.length >=1 && args[0]!="" );
-		run(ConfigUtils.loadConfig(args[0]));
-		// makes some sense to not modify the config here but in the run method to help  with regression testing.
+	@Test
+	public final void test() {
+		try {
+			String [] args = {"scenarios/equil/config.xml",
+				  "--config:controler.outputDirectory", utils.getOutputDirectory(),
+				  "--config:controler.lastIteration=1",
+				  "--config:controler.writeEventsInterval=1"
+			} ;
+			RunMatsim.main( args ) ;
+		} catch ( Exception ee ) {
+			Logger.getLogger(this.getClass()).fatal("there was an exception: \n" + ee ) ;
+
+			// if one catches an exception, then one needs to explicitly fail the test:
+			Assert.fail();
+		}
+
+
 	}
-	
-	static void run(Config config) {
-		
-		// possibly modify config here
-		
-		// ---
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
-		// possibly modify scenario here
-		
-		// ---
-		
-		Controler controler = new Controler( scenario ) ;
-		
-		// possibly modify controler here
-		
-		// ---
-		
-		controler.run();
-	}
-	
+
 }
